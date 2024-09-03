@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "flaskr"
+version = "0.1.0"
+description = "Trivia App"
+authors = ["Matt Gaskey <mattgaskey@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+aniso8601 = "^9.0.0"
+Click = "^8.0"
+Flask = "^3.0.3"
+Flask-Cors = "^5.0.0"
+flask-migrate = "^4.0.7"
+Flask-RESTful = "^0.3.7"
+Flask-SQLAlchemy = "^3.1.1"
+itsdangerous = "^2.2.0"
+Jinja2 = "^3.1.4"
+MarkupSafe = "^2.1.1"
+psycopg2-binary = "^2.9.9"
+pytz = "^2024.1"
+six = "^1.16.0"
+SQLAlchemy = "^2.0.31"
+Werkzeug = "^3.0.4"
+gunicorn = "^22.0.0"
+
+[build-system]
+requires = ["poetry-core>=1.8.3"]
+build-backend = "poetry.core.masonry.api"
