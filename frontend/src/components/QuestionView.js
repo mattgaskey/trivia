@@ -21,8 +21,9 @@ class QuestionView extends Component {
   }
 
   getQuestions = () => {
+    const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
     $.ajax({
-      url: `/questions?page=${this.state.page}`, //TODO: update request URL
+      url: `${apiBaseUrl}/questions?page=${this.state.page}`,
       type: 'GET',
       success: (result) => {
         this.setState({
@@ -64,8 +65,9 @@ class QuestionView extends Component {
   }
 
   getByCategory = (id) => {
+    const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
     $.ajax({
-      url: `/categories/${id}/questions`, //TODO: update request URL
+      url: `${apiBaseUrl}/categories/${id}/questions`,
       type: 'GET',
       success: (result) => {
         this.setState({
@@ -83,8 +85,9 @@ class QuestionView extends Component {
   };
 
   submitSearch = (searchTerm) => {
+    const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
     $.ajax({
-      url: `/questions`, //TODO: update request URL
+      url: `${apiBaseUrl}/questions`,
       type: 'POST',
       dataType: 'json',
       contentType: 'application/json',
@@ -109,10 +112,11 @@ class QuestionView extends Component {
   };
 
   questionAction = (id) => (action) => {
+    const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
     if (action === 'DELETE') {
       if (window.confirm('are you sure you want to delete the question?')) {
         $.ajax({
-          url: `/questions/${id}`, //TODO: update request URL
+          url: `${apiBaseUrl}/questions/${id}`,
           type: 'DELETE',
           success: (result) => {
             this.getQuestions();

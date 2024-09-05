@@ -15,8 +15,9 @@ class FormView extends Component {
   }
 
   componentDidMount() {
+    const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
     $.ajax({
-      url: `/categories`, //TODO: update request URL
+      url: `${apiBaseUrl}/categories`,
       type: 'GET',
       success: (result) => {
         this.setState({ categories: result.categories });
@@ -30,9 +31,10 @@ class FormView extends Component {
   }
 
   submitQuestion = (event) => {
+    const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
     event.preventDefault();
     $.ajax({
-      url: '/questions', //TODO: update request URL
+      url: `${apiBaseUrl}`,
       type: 'POST',
       dataType: 'json',
       contentType: 'application/json',

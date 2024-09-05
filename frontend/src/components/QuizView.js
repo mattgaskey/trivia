@@ -20,8 +20,9 @@ class QuizView extends Component {
   }
 
   componentDidMount() {
+    const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
     $.ajax({
-      url: `/categories`, //TODO: update request URL
+      url: `${apiBaseUrl}/categories`,
       type: 'GET',
       success: (result) => {
         this.setState({ categories: result.categories });
@@ -43,13 +44,14 @@ class QuizView extends Component {
   };
 
   getNextQuestion = () => {
+    const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
     const previousQuestions = [...this.state.previousQuestions];
     if (this.state.currentQuestion.id) {
       previousQuestions.push(this.state.currentQuestion.id);
     }
 
     $.ajax({
-      url: '/quizzes', //TODO: update request URL
+      url: `${apiBaseUrl}/quizzes`,
       type: 'POST',
       dataType: 'json',
       contentType: 'application/json',
