@@ -13,7 +13,9 @@ services:
   app:
     container_name: trivia-app
     image: api
-    build: .
+    build:
+      context: ./backend
+      dockerfile: backend.Dockerfile
     environment:
       FLASK_APP: flaskr.py
       FLASK_ENV: development
@@ -22,7 +24,7 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - .:/app
+      - ./backend:/app
     depends_on:
       - db
   admin:
@@ -36,8 +38,8 @@ services:
     container_name: trivia-frontend
     image: frontend
     build:
-      context: ../frontend
-      dockerfile: Dockerfile
+      context: ./frontend
+      dockerfile: frontend.Dockerfile
     environment:
       REACT_APP_API_BASE_URL: http://localhost:5000
     ports:
