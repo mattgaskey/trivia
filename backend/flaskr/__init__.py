@@ -21,7 +21,7 @@ def create_app(config_class=Config, test_config=None):
         database_path = app.config.get('SQLALCHEMY_DATABASE_URI')
         setup_db(app, database_path=database_path)
 
-    CORS(app, origins='*')
+    CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
 
     @app.after_request
     def after_request(response):

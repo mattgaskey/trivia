@@ -12,6 +12,7 @@ services:
       - db:/var/lib/postgresql/data
   app:
     container_name: trivia-app
+    image: api
     build: .
     environment:
       FLASK_APP: flaskr.py
@@ -33,6 +34,7 @@ services:
       - db
   frontend:
     container_name: trivia-frontend
+    image: frontend
     build:
       context: ../frontend
       dockerfile: Dockerfile
