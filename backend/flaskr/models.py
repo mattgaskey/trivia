@@ -10,7 +10,6 @@ setup_db(app)
     binds a flask application and a SQLAlchemy service
 """
 def setup_db(app):
-    db.app = app
     db.init_app(app)
     with app.app_context():
         db.create_all()

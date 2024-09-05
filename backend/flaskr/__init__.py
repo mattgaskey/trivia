@@ -7,8 +7,6 @@ from flaskr.models import setup_db, Question, Category
 
 import random
 
-db = SQLAlchemy()
-
 QUESTIONS_PER_PAGE = 10
 
 def paginate_questions(request, selection):
@@ -25,11 +23,10 @@ def create_app(config_class=Config, test_config=None):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    if test_config is None:
-        setup_db(app)
-    else:
-        database_path = test_config.get('SQLALCHEMY_DATABASE_URI')
-        setup_db(app, database_path=database_path)
+    if test_config:
+        app.config.update(test_config)
+
+    setup_db(app)
 
     CORS(app)
 
@@ -61,7 +58,7 @@ def create_app(config_class=Config, test_config=None):
         categories = Category.query.all()
         formatted_categories = {category.id: category.type for category in categories}
 
-        if current_questions is None or formatted_categories is None:
+        if len(current_questions) == 0 or len(formatted_categories) == 0:
             abort(404)
 
         return jsonify({
@@ -76,19 +73,15 @@ def create_app(config_class=Config, test_config=None):
     def delete_question(question_id):
         question = Question.query.get(question_id)
         if question is None:
-            abort(404)
-        try:    
-            question.delete()
-            updated_questions = Question.query.all()
-            current_questions = paginate_questions(request, updated_questions)
-            return jsonify({
-                'success': True,
-                'deleted': question_id,
-                'questions': current_questions
-            })
-        
-        except:
             abort(422)
+        question.delete()
+        updated_questions = Question.query.all()
+        current_questions = paginate_questions(request, updated_questions)
+        return jsonify({
+            'success': True,
+            'deleted': question_id,
+            'questions': current_questions
+        })
     
     @app.route('/questions', methods=['POST'])
     def create_question():
@@ -130,10 +123,10 @@ def create_app(config_class=Config, test_config=None):
 
     @app.route('/categories/<int:category_id>/questions')
     def get_questions_by_category(category_id):
-        questions = Question.query.filter(Question.category == category_id).all()
+        questions = Question.query.filter(Question.category == str(category_id)).all()
         category = Category.query.get(category_id)
 
-        if questions is None or category is None:
+        if not questions or not category:
             abort(404)
 
         current_questions = paginate_questions(request, questions)
