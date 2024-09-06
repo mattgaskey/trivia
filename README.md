@@ -46,7 +46,7 @@ and the frontend has a single service:
 
 - `frontend`: a NodeJS image to run the React app at `localhost:3000`
 
-Starting the entire application is simplified with docker-compose commands. (If you don't have Docker and/or Docker Compose install, see the [docs](https://docs.docker.com/engine/install/).)  From the project directory run:
+Starting the entire application is simplified with docker-compose commands. (If you don't have Docker and/or Docker Compose installed, see the [docs](https://docs.docker.com/engine/install/).)  From the project directory run:
 
 ```
 docker-compose up -d --build
