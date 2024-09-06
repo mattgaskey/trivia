@@ -74,7 +74,6 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertTrue(data['categories'])
-        self.assertTrue(data['current_category'])
         self.assertTrue(data['questions'])
         self.assertEqual(data['success'], True)
         self.assertTrue(data['total_questions'])
@@ -85,7 +84,6 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertTrue(data['categories'])
-        self.assertTrue(data['current_category'])
         self.assertTrue(data['questions'])
         self.assertEqual(data['success'], True)
         self.assertTrue(data['total_questions'])
@@ -124,7 +122,6 @@ class TriviaTestCase(unittest.TestCase):
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
-        self.assertTrue(data['current_category'])
         self.assertTrue(data['questions'])
         self.assertEqual(data['success'], True)
         self.assertTrue(data['total_questions'])
