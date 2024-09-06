@@ -1,10 +1,8 @@
-# API Development and Documentation Final Project
+# Trivia App
 
-## Trivia App
+This project if forked from Udacity's Full Stack Developer Nanodegree project at [Udacity](https://github.com/udacity/cd0037-API-Development-and-Documentation-project).
 
-Udacity is invested in creating bonding experiences for its employees and students. A bunch of team members got the idea to hold trivia on a regular basis and created a webpage to manage the trivia app and play the game, but their API experience is limited and still needs to be built out.
-
-That's where you come in! Help them finish the trivia app so they can start holding trivia and seeing who's the most knowledgeable of the bunch. The application must:
+The goal of this project is to create a basic CRUD application for a simple trivia game. The rubric for this project says that the app should:
 
 1. Display questions - both all questions and by category. Questions should show the question, category and difficulty rating by default and can show/hide the answer.
 2. Delete questions.
@@ -12,38 +10,96 @@ That's where you come in! Help them finish the trivia app so they can start hold
 4. Search for questions based on a text query string.
 5. Play the quiz game, randomizing either all questions or within a specific category.
 
-Completing this trivia app will give you the ability to structure plan, implement, and test an API - skills essential for enabling your future applications to communicate with others.
+The original repo comes with starter code for the backend Flask-based API written in Python, with a test database written in PostgreSQL, as well as a React frontend.
 
-## Starting and Submitting the Project
+## Improvements
 
-[Fork](https://help.github.com/en/articles/fork-a-repo) the project repository and [clone](https://help.github.com/en/articles/cloning-a-repository) your forked repository to your machine. Work on the project locally and make sure to push all your changes to the remote repository before submitting the link to your repository in the Classroom.
-
-## About the Stack
-
-We started the full stack application for you. It is designed with some key functional areas:
+I have made several improvements to the structure of the application, to use the latest versions of all tech across the stack and to containerize the entire application using Docker and Docker Compose.
 
 ### Backend
 
-The [backend](./backend/README.md) directory contains a partially completed Flask and SQLAlchemy server. You will work primarily in `__init__.py` to define your endpoints and can reference models.py for DB and SQLAlchemy setup. These are the files you'd want to edit in the backend:
+The initial [backend](./backend/README.md) directory contained a partially completed Flask and SQLAlchemy server. The idea was to work primarily in `backend/flaskr/__init__.py` to define endpoints, and to reference `models.py` for DB and SQLAlchemy setup.
 
-1. `backend/flaskr/__init__.py`
-2. `backend/test_flaskr.py`
+For more complex applications, I might add some more project structure, breaking out API components into separate directories, and integrating them into the application using blueprints.  However, I chose to keep the simple project structure with all the API definitions in a single file.
+
+The main improvement to the backend is to implement Poetry for dependency management and virtualization.  Instead of a static `requirements.txt` file, and installing dependencies with `pip install`, the application uses Poetry to handle those libraries.  I've also used minimum version requirements so that the latest versions of all libraries are used.
 
 > View the [Backend README](./backend/README.md) for more details.
 
 ### Frontend
 
-The [frontend](./frontend/README.md) directory contains a complete React frontend to consume the data from the Flask server. If you have prior experience building a frontend application, you should feel free to edit the endpoints as you see fit for the backend you design. If you do not have prior experience building a frontend application, you should read through the frontend code before starting and make notes regarding:
+The [frontend](./frontend/README.md) directory contained a complete React frontend to consume the data from the Flask server. This frontend made use of React v16, and some older JS / jQuery patterns for querying API endpoints. The styling for React components was also quite minimal.
 
-1. What are the end points and HTTP methods the frontend is expecting to consume?
-2. How are the requests from the frontend formatted? Are they expecting certain parameters or payloads?
-
-Pay special attention to what data the frontend is expecting from each API response to help guide how you format your API. The places where you may change the frontend behavior, and where you should be looking for the above information, are marked with `TODO`. These are the files you'd want to edit in the frontend:
-
-1. `frontend/src/components/QuestionView.js`
-2. `frontend/src/components/FormView.js`
-3. `frontend/src/components/QuizView.js`
-
-By making notes ahead of time, you will practice the core skill of being able to read and understand code and will have a simple plan to follow to build out the endpoints of your backend API.
+My improvements to the frontend include upgrading the `package.json` with the latest versions of React and its supporting packages, removing the jQuery dependency in favor of modern JS `fetch()` methods, using React Hooks to handle state and dynamically update the view, and improving the look and feel of the user interface via CSS.
 
 > View the [Frontend README](./frontend/README.md) for more details.
+
+### Deployment
+
+Deploying the application is simplified through the use of Docker containers, and Docker Compose. The backend features three services:
+
+- `db`: a Postgres image to store the supplied `trivia.psql` database, available on port `5432`
+- `app`: a Python image to run the Flask app API endpoints on port `5000`
+- `admin`: an Adminer image for db access (using the postgres credentials defined for the `db` service) on port `8080`
+
+and the frontend has a single service:
+
+- `frontend`: a NodeJS image to run the React app at `localhost:3000`
+
+Starting the entire application is simplified with docker-compose commands. (If you don't have Docker and/or Docker Compose install, see the [docs](https://docs.docker.com/engine/install/).)  From the project directory run:
+
+```
+docker-compose up -d --build
+```
+
+This will build and deploy all the services needed to run the application. Once the React frontend has compiled (you can check the status by running `docker logs -f`), the app can be accessed at [http://localhost:3000](http://localhost:3000).
+
+Please note the use of `http` and NOT `https`.  CORS is not set up to handle requests across security protocols.
+
+To verify that the database has populated as expected, log in to the Adminer service at [http://localhost:8080](http://localhost:8080) with the follwing credentials:
+
+```
+System: PostgreSQL
+Server: db
+Username: postgres
+Password: postgres
+Database: db
+```
+
+To stop the project and remove the container, run:
+
+```
+docker-compose down
+```
+
+or, to also remove peristent data:
+
+```
+docker-compose down -v
+```
+
+## Testing
+
+A suite of unit tests is defined at `backend/test_flasker.py`.  These will test the validity of all available endpoints defined in the `flaskr` app, as well as the various error handlers associated with those endpoints.  See the [Backend README](./backend/README.md) for a detailed explanation of each endpoint.
+
+To run the tests, you'll need to access the Docker container running the `app` service.  There are many ways to accomplish this, but I will outline the simplest: running the Docker container shell in the terminal, one with VSCode Dev Containers.
+
+To access the bash shell command line for the `app` service, while the Docker container is running, run:
+
+```
+docker exec -it trivia-app sh
+```
+
+Then, to launch the test suite, run:
+
+```
+python test_flaskr.py
+```
+
+The tests will initialize, populate the test database, then give a status of `OK` if successful.
+
+To exit the container shell, run:
+
+```
+exit
+```
