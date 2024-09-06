@@ -4,7 +4,11 @@ The backend for this Trivia app is a simple React app that queries the backend A
 
 ## Getting Setup
 
-No additional setup is required for this part of the project, once the Docker container is running and the React image has compiled.
+No additional setup is required for this part of the project, once the Docker container is running and the React image has compiled. To view the logs for this service, run:
+
+```sh
+docker logs -f trivia-frontend
+```
 
 ## Improvements
 
