@@ -105,21 +105,17 @@ def create_app(config_class=Config, test_config=None):
         difficulty = body.get('difficulty', None)
 
         if question is None or answer is None or category is None or difficulty is None:
-            abort(404)
-
-        try:
-            new_question = Question(question=question, answer=answer, category=category, difficulty=difficulty)
-            new_question.insert()
-            updated_questions = Question.query.all()
-            current_questions = paginate_questions(request, updated_questions)
-            return jsonify({
-                'success': True,
-                'created': new_question.id,
-                'questions': current_questions
-            })
-        
-        except:
             abort(422)
+
+        new_question = Question(question=question, answer=answer, category=category, difficulty=difficulty)
+        new_question.insert()
+        updated_questions = Question.query.all()
+        current_questions = paginate_questions(request, updated_questions)
+        return jsonify({
+            'success': True,
+            'created': new_question.id,
+            'questions': current_questions
+        })
 
     @app.route('/categories/<int:category_id>/questions')
     def get_questions_by_category(category_id):
