@@ -10,11 +10,7 @@ const QuestionView = () => {
   const [categories, setCategories] = useState({});
   const [currentCategory, setCurrentCategory] = useState(null);
 
-  useEffect(() => {
-    getQuestions();
-  }, [page]);
-
-  const getQuestions = async () => {
+  const getQuestions = useCallback(async () => {
     const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
     try {
       const response = await fetch(`${apiBaseUrl}/questions?page=${page}`);
@@ -26,7 +22,11 @@ const QuestionView = () => {
     } catch (error) {
       alert('Unable to load questions. Please try your request again');
     }
-  };
+  }, [page]);
+
+  useEffect(() => {
+    getQuestions();
+  }, [getQuestions]);
 
   const selectPage = useCallback((num) => {
     setPage(num);

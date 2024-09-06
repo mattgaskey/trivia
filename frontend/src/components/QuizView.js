@@ -9,9 +9,10 @@ const QuizView = () => {
   const [showAnswer, setShowAnswer] = useState(false);
   const [categories, setCategories] = useState({});
   const [numCorrect, setNumCorrect] = useState(0);
-  const [currentQuestion, setCurrentQuestion] = useState({});
+  const [currentQuestion, setCurrentQuestion] = useState(null);
   const [guess, setGuess] = useState('');
   const [forceEnd, setForceEnd] = useState(false);
+  const [noMoreQuestions, setNoMoreQuestions] = useState(false);
 
   useEffect(() => {
     loadCategories();
@@ -28,19 +29,10 @@ const QuizView = () => {
     }
   };
 
-  const selectCategory = useCallback(({ type, id = 0 }) => {
-    setQuizCategory({ type, id });
-    getNextQuestion({ type, id });
-  }, []);
-
-  const handleChange = (event) => {
-    setGuess(event.target.value);
-  };
-
-  const getNextQuestion = async (category) => {
+  const getNextQuestion = useCallback(async (category) => {
     const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
     const newPreviousQuestions = [...previousQuestions];
-    if (currentQuestion.id) {
+    if (currentQuestion && currentQuestion.id) {
       newPreviousQuestions.push(currentQuestion.id);
     }
 
@@ -56,14 +48,26 @@ const QuizView = () => {
         }),
       });
       const result = await response.json();
-      setShowAnswer(false);
-      setPreviousQuestions(newPreviousQuestions);
-      setCurrentQuestion(result.question);
-      setGuess('');
-      setForceEnd(!result.question);
+      if (result.question) {
+        setCurrentQuestion(result.question);
+        setShowAnswer(false);
+        setPreviousQuestions(newPreviousQuestions);
+        setGuess(''); // Clear the guess input
+      } else {
+        setNoMoreQuestions(true);
+      }
     } catch (error) {
-      alert('Unable to load question. Please try your request again');
+      alert('Unable to load next question. Please try your request again');
     }
+  }, [previousQuestions, currentQuestion, quizCategory]);
+
+  const selectCategory = useCallback(({ type, id = 0 }) => {
+    setQuizCategory({ type, id });
+    getNextQuestion({ type, id });
+  }, [getNextQuestion]);
+
+  const handleChange = (event) => {
+    setGuess(event.target.value);
   };
 
   const submitGuess = (event) => {
@@ -78,14 +82,16 @@ const QuizView = () => {
     setPreviousQuestions([]);
     setShowAnswer(false);
     setNumCorrect(0);
-    setCurrentQuestion({});
+    setCurrentQuestion(null);
     setGuess('');
     setForceEnd(false);
+    setNoMoreQuestions(false);
   };
 
   const evaluateAnswer = () => {
+    if (!currentQuestion) return false;
     const formatGuess = guess
-      .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '')
+      .replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, '')
       .toLowerCase();
     const answerArray = currentQuestion.answer
       .toLowerCase()
@@ -122,40 +128,61 @@ const QuizView = () => {
       </div>
     </div>
   );
-
+  
+  const renderNoMoreQuestions = () => (
+    <div className='quiz-play-holder'>
+      <div className='final-header'>No more questions available.</div>
+      <div className='show-score button' onClick={() => setForceEnd(true)}>
+        Show Final Score
+      </div>
+    </div>
+  );
+  
   const renderCorrectAnswer = () => {
     const evaluate = evaluateAnswer();
     return (
       <div className='quiz-play-holder'>
-        <div className='quiz-question'>{currentQuestion.question}</div>
+        <div className='quiz-question'>{currentQuestion?.question}</div>
         <div className={`${evaluate ? 'correct' : 'wrong'}`}>
           {evaluate ? 'You were correct!' : 'You were incorrect'}
         </div>
-        <div className='quiz-answer'>{currentQuestion.answer}</div>
+        <div className='quiz-answer'>{currentQuestion?.answer}</div>
         <div className='next-question button' onClick={() => getNextQuestion()}>
           Next Question
         </div>
       </div>
     );
   };
-
-  const renderPlay = () => (
-    previousQuestions.length === questionsPerPlay || forceEnd ? (
-      renderFinalScore()
-    ) : showAnswer ? (
-      renderCorrectAnswer()
-    ) : (
+  
+  const renderPlay = () => {
+    if (forceEnd) {
+      return renderFinalScore();
+    }
+  
+    if (noMoreQuestions) {
+      return renderNoMoreQuestions();
+    }
+  
+    if (previousQuestions.length === questionsPerPlay) {
+      return renderFinalScore();
+    }
+  
+    if (showAnswer) {
+      return renderCorrectAnswer();
+    }
+  
+    return (
       <div className='quiz-play-holder'>
-        <div className='quiz-question'>{currentQuestion.question}</div>
+        <div className='quiz-question'>{currentQuestion?.question}</div>
         <form onSubmit={submitGuess}>
           <input type='text' name='guess' value={guess} onChange={handleChange} />
           <input className='submit-guess' type='submit' value='Submit Answer' />
         </form>
       </div>
-    )
-  );
-
+    );
+  };
+  
   return quizCategory ? renderPlay() : renderPrePlay();
-};
-
-export default QuizView;
+  };
+  
+  export default QuizView;
