@@ -1,7 +1,50 @@
-.form-view > label {
-  padding: 0px 0px 10px;
+#add-form {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #f9f9f9;
 }
 
-#add-form {
+.form-view {
+  display: grid;
+  grid-template-columns: .5fr 2fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.form-view label {
+  margin-bottom: -10px;
+}
+
+.form-view input[type="text"],
+.form-view select {
+  width: 100%;
+  margin-top: 10px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.success-message {
+  color: green;
+  font-weight: bold;
+  margin-top: 10px;
   text-align: center;
+}
+
+.button {
+  grid-column: 1 / -1;
+  justify-self: center;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.button:hover {
+  background-color: #0056b3;
 }

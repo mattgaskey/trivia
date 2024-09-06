@@ -17,13 +17,12 @@
   font-size: large;
 }
 
-h2 {
-  text-align: center;
+.clickable {
+  cursor: pointer;
 }
 
-li {
+h2 {
   text-align: center;
-  margin: 5px 0px;
 }
 
 ul {
@@ -36,4 +35,103 @@ form {
   flex-direction: column;
   width: 80%;
   margin: auto;
+}
+
+.question-view {
+  display: flex;
+  padding: 40px;
+  gap: 20px;
+}
+
+.categories-list {
+  flex: 1;
+  width: 100%;
+  max-width: 33%;
+  margin-bottom: 10px;
+}
+
+.categories-list h2 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.categories-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.categories-list li {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.categories-list li:hover {
+  background-color: #f0f0f0;
+}
+
+.categories-list img.category {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+}
+
+.questions-list {
+  flex: 3;
+  max-width: 66%;
+}
+
+.questions-list h2 {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.pagination-menu {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.page-num {
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.page-num.active {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.search-form {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.search-form input[type='text'] {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.search-form input[type='submit'] {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.search-form input[type='submit']:hover {
+  background-color: #0056b3;
 }
