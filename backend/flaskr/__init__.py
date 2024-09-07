@@ -1,14 +1,17 @@
-from config import Config
-from flask import Flask, request, abort, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from flask_cors import CORS
-from flaskr.models import setup_db, Question, Category
+"""Flask app defining API endpoints."""
 
 import random
+from config import Config
+from flask import Flask, request, abort, jsonify
+from flask_cors import CORS
+from flaskr.models import setup_db, Question, Category
+from sqlalchemy.exc import SQLAlchemyError
 
 QUESTIONS_PER_PAGE = 10
 
+
 def paginate_questions(request, selection):
+    """Helper method for pagination."""
     page = request.args.get('page', 1, type=int)
     start = (page - 1) * QUESTIONS_PER_PAGE
     end = start + QUESTIONS_PER_PAGE
@@ -18,7 +21,9 @@ def paginate_questions(request, selection):
 
     return current_questions
 
+
 def create_app(config_class=Config, test_config=None):
+    """Create and configure the Flask app."""
     app = Flask(__name__)
     app.config.from_object(config_class)
 
@@ -31,12 +36,16 @@ def create_app(config_class=Config, test_config=None):
 
     @app.after_request
     def after_request(response):
-        response.headers.add('Access-Control-Allow-Credentials', 'true')
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,true')
-        response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
-        response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PATCH,DELETE,OPTIONS')
+        response.headers.add('Access-Control-Allow-Credentials', 
+                             'true')
+        response.headers.add('Access-Control-Allow-Headers', 
+                             'Content-Type,Authorization,true')
+        response.headers.add('Access-Control-Allow-Origin', 
+                             'http://localhost:3000')
+        response.headers.add('Access-Control-Allow-Methods', 
+                             'GET,POST,PATCH,DELETE,OPTIONS')
         return response
-    
+
     @app.route('/categories')
     def get_categories():
         try:
@@ -45,12 +54,13 @@ def create_app(config_class=Config, test_config=None):
             if categories is None:
                 abort(404)
 
-            formatted_categories = {category.id: category.type for category in categories}
+            formatted_categories = {category.id: category.type 
+                                    for category in categories}
             return jsonify({
                 'success': True,
                 'categories': formatted_categories
             })
-        except:
+        except SQLAlchemyError:
             abort(422)
 
     @app.route('/questions')
@@ -59,7 +69,8 @@ def create_app(config_class=Config, test_config=None):
             questions = Question.query.all()
             current_questions = paginate_questions(request, questions)
             categories = Category.query.all()
-            formatted_categories = {category.id: category.type for category in categories}
+            formatted_categories = {category.id: category.type 
+                                    for category in categories}
 
             if len(current_questions) == 0 or len(formatted_categories) == 0:
                 abort(404)
@@ -71,7 +82,7 @@ def create_app(config_class=Config, test_config=None):
                 'categories': formatted_categories,
                 'current_category': None
             })
-        except:
+        except SQLAlchemyError:
             abort(422)
 
     @app.route('/questions/<int:question_id>', methods=['DELETE'])
@@ -79,7 +90,7 @@ def create_app(config_class=Config, test_config=None):
         try:
             question = Question.query.get(question_id)
             if question is None:
-                abort(422)
+                abort(404)
             question.delete()
             updated_questions = Question.query.all()
             current_questions = paginate_questions(request, updated_questions)
@@ -88,9 +99,9 @@ def create_app(config_class=Config, test_config=None):
                 'deleted': question_id,
                 'questions': current_questions
             })
-        except:
+        except SQLAlchemyError:
             abort(422)
-    
+
     @app.route('/questions', methods=['POST'])
     def create_question():
         body = request.get_json()
@@ -103,7 +114,8 @@ def create_app(config_class=Config, test_config=None):
             abort(400)
 
         try:
-            new_question = Question(question=question, answer=answer, category=category, difficulty=difficulty)
+            new_question = Question(question=question, answer=answer, 
+                                    category=category, difficulty=difficulty)
             new_question.insert()
             updated_questions = Question.query.all()
             current_questions = paginate_questions(request, updated_questions)
@@ -112,16 +124,18 @@ def create_app(config_class=Config, test_config=None):
                 'created': new_question.id,
                 'questions': current_questions
             })
-        except:
+        except SQLAlchemyError:
             abort(422)
-    
+
     @app.route('/questions/search', methods=['POST'])
     def search_questions():
         try:
             body = request.get_json()
             search_term = body.get('searchTerm', None)
-            questions = Question.query.filter(Question.question.ilike(f'%{search_term}%')).all()
-            formatted_questions = [question.format() for question in questions]
+            questions = Question.query.filter(
+                Question.question.ilike(f'%{search_term}%')).all()
+            formatted_questions = [question.format() 
+                                   for question in questions]
 
             return jsonify({
                 'success': True,
@@ -129,13 +143,14 @@ def create_app(config_class=Config, test_config=None):
                 'total_questions': len(formatted_questions),
                 'current_category': None
             })
-        except:
+        except SQLAlchemyError:
             abort(422)
 
     @app.route('/categories/<int:category_id>/questions')
     def get_questions_by_category(category_id):
         try:
-            questions = Question.query.filter(Question.category == str(category_id)).all()
+            questions = Question.query.filter(
+                Question.category == str(category_id)).all()
             category = Category.query.get(category_id)
 
             if not questions or not category:
@@ -149,7 +164,7 @@ def create_app(config_class=Config, test_config=None):
                 'total_questions': len(current_questions),
                 'current_category': category.type
             })
-        except:
+        except SQLAlchemyError:
             abort(422)
 
     @app.route('/quizzes', methods=['POST'])
@@ -163,9 +178,12 @@ def create_app(config_class=Config, test_config=None):
                 abort(400)
 
             if quiz_category['id'] == 0:
-                questions = Question.query.filter(Question.id.notin_(previous_questions)).all()
+                questions = Question.query.filter(
+                    Question.id.notin_(previous_questions)).all()
             else:
-                questions = Question.query.filter(Question.category == quiz_category['id'], Question.id.notin_(previous_questions)).all()
+                questions = Question.query.filter(
+                    Question.category == quiz_category['id'], 
+                    Question.id.notin_(previous_questions)).all()
 
             random_question = random.choice(questions) if questions else None
 
@@ -173,7 +191,7 @@ def create_app(config_class=Config, test_config=None):
                 'success': True,
                 'question': random_question.format() if random_question else None
             })
-        except:
+        except SQLAlchemyError:
             abort(422)
 
     @app.errorhandler(400)
@@ -191,7 +209,7 @@ def create_app(config_class=Config, test_config=None):
             'error': 404,
             'message': 'Resource not found'
         }), 404
-    
+
     @app.errorhandler(422)
     def unprocessable(error):
         return jsonify({
@@ -199,5 +217,5 @@ def create_app(config_class=Config, test_config=None):
             'error': 422,
             'message': 'Unprocessable entity'
         }), 422
-    
+
     return app
