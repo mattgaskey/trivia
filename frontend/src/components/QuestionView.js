@@ -65,7 +65,7 @@ const QuestionView = () => {
   const submitSearch = async (searchTerm) => {
     const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
     try {
-      const response = await fetch(`${apiBaseUrl}/questions`, {
+      const response = await fetch(`${apiBaseUrl}/questions/search`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
